@@ -7,7 +7,6 @@ from PySide6.QtCore import QObject
 from PySide6.QtWidgets import QMessageBox
 
 from bioplot.core import ExportEngine
-from bioplot.ui.panels.figure_canvas import FigureCanvas
 
 
 class ExportController(QObject):
@@ -15,11 +14,11 @@ class ExportController(QObject):
 
     def __init__(
         self,
-        canvas: FigureCanvas,
+        figure_panel,   # MultiFigurePanel
         parent: Optional[QObject] = None,
     ) -> None:
         super().__init__(parent)
-        self._canvas = canvas
+        self._figure_panel = figure_panel
 
     def show_export_dialog(self) -> None:
         from bioplot.ui.dialogs.export_dialog import ExportDialog
@@ -28,7 +27,7 @@ class ExportController(QObject):
             self._do_export(dlg)
 
     def _do_export(self, dlg) -> None:
-        fig = self._canvas.current_figure
+        fig = self._figure_panel.current_canvas.current_figure
         try:
             path = ExportEngine.export(
                 fig,

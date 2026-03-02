@@ -7,9 +7,10 @@ from .violin import ViolinPlot
 from .scatter import ScatterPlot
 from .barplot import BarPlot
 from .umap import UMAPPlot
+from .dot_plot import DotPlot
 
 __all__ = [
     "BasePlot",
     "VolcanoPlot", "MAPlot", "HeatmapPlot", "PCAPlot",
-    "ViolinPlot", "ScatterPlot", "BarPlot", "UMAPPlot",
+    "ViolinPlot", "ScatterPlot", "BarPlot", "UMAPPlot", "DotPlot",
 ]

@@ -118,13 +118,17 @@ class DataManager(QObject):
         def _load(path: Path) -> object:
             try:
                 import anndata as ad  # type: ignore
-                return ad.read_h5ad(str(path), backed="r")
+                # Load fully so we can read obs/var without backing-store issues
+                return ad.read_h5ad(str(path))
             except ImportError as e:
                 raise RuntimeError(
-                    "scanpy/anndata not installed. Install with: pip install scanpy anndata"
+                    "anndata not installed. Run: pip install scanpy anndata"
                 ) from e
 
         worker = FunctionWorker(_load, ds.source_path)
+        worker.signals.progress.connect(
+            lambda p: self.load_progress.emit(ds.dataset_id, p)
+        )
         worker.signals.result.connect(
             lambda adata: self._on_h5ad_loaded(ds.dataset_id, adata)
         )
@@ -134,12 +138,37 @@ class DataManager(QObject):
         self._pool.start(worker)
 
     def _on_h5ad_loaded(self, dataset_id: str, adata: object) -> None:
+        import pandas as pd
+
         ds = self._datasets.get(dataset_id)
         if ds is None:
             return
+
         ds.h5ad_path = ds.source_path
-        # Store adata reference in extras for plot engine
-        ds.description = f"AnnData: {adata}"  # type: ignore[union-attr]
+
+        # Extract obs metadata (cell/sample annotations)
+        try:
+            ds.metadata = pd.DataFrame(adata.obs)  # type: ignore[union-attr]
+        except Exception:
+            pass
+
+        # Extract gene annotations
+        try:
+            ds.gene_info = pd.DataFrame(adata.var)  # type: ignore[union-attr]
+        except Exception:
+            pass
+
+        # Summarise for the navigator
+        n_obs = getattr(adata, "n_obs", "?")
+        n_vars = getattr(adata, "n_vars", "?")
+        ds.description = (
+            f"AnnData {n_obs} cells × {n_vars} genes"
+        )
+
+        # Store AnnData object reference so plot engine can access it
+        # (stored in dataset for the UMAP/DotPlot renderers)
+        ds._adata_ref = adata  # type: ignore[attr-defined]
+
         self.dataset_updated.emit(dataset_id)
 
     # ── Serialization support ─────────────────────────────────────────────────
