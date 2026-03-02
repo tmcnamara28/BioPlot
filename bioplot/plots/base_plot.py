@@ -4,7 +4,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-import matplotlib.pyplot as plt
+from matplotlib.figure import Figure as MplFigure
 
 if TYPE_CHECKING:
     from matplotlib.figure import Figure
@@ -39,12 +39,15 @@ class BasePlot(ABC):
 
     @staticmethod
     def _make_figure(config: "PlotConfig") -> "Figure":
-        """Create a Figure with dimensions and DPI from *config*."""
+        """Create a Figure with dimensions and DPI from *config*.
+
+        Uses ``matplotlib.figure.Figure`` directly so it is safe to call
+        from worker threads (avoids pyplot's Qt machinery).
+        """
         from bioplot.core.export_engine import mm_to_inches
         w = mm_to_inches(config.figure.width_mm)
         h = mm_to_inches(config.figure.height_mm)
-        fig = plt.figure(figsize=(w, h), dpi=config.figure.dpi)
-        return fig
+        return MplFigure(figsize=(w, h), dpi=config.figure.dpi)
 
     @staticmethod
     def _apply_axis_config(ax, x_cfg, y_cfg) -> None:
@@ -82,11 +85,15 @@ class BasePlot(ABC):
 
     @staticmethod
     def _placeholder_figure(config: "PlotConfig", message: str) -> "Figure":
-        """Return an empty figure with a centred message."""
+        """Return an empty figure with a centred message.
+
+        Thread-safe: uses ``matplotlib.figure.Figure`` directly.
+        """
         from bioplot.core.export_engine import mm_to_inches
         w = mm_to_inches(config.figure.width_mm)
         h = mm_to_inches(config.figure.height_mm)
-        fig, ax = plt.subplots(figsize=(w, h), dpi=config.figure.dpi)
+        fig = MplFigure(figsize=(w, h), dpi=config.figure.dpi)
+        ax = fig.add_subplot(111)
         ax.text(0.5, 0.5, message, ha="center", va="center", transform=ax.transAxes,
                 fontsize=11, color="gray")
         ax.set_axis_off()

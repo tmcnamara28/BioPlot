@@ -127,16 +127,13 @@ class PlotController(QObject):
 
     def _on_render_error(self, message: str) -> None:
         self._canvas.hide_progress()
-        from bioplot.plots.base_plot import BasePlot
-        # Show error on canvas
-        fig = self.current_config
-        import matplotlib
-        matplotlib.use("Agg")
-        import matplotlib.pyplot as plt
+        from matplotlib.figure import Figure
         from bioplot.core.export_engine import mm_to_inches
-        w = mm_to_inches(fig.figure.width_mm)
-        h = mm_to_inches(fig.figure.height_mm)
-        err_fig, ax = plt.subplots(figsize=(w, h))
+        cfg = self.current_config
+        w = mm_to_inches(cfg.figure.width_mm)
+        h = mm_to_inches(cfg.figure.height_mm)
+        err_fig = Figure(figsize=(w, h))
+        ax = err_fig.add_subplot(111)
         ax.text(0.5, 0.5, f"Render error:\n{message}",
                 ha="center", va="center", transform=ax.transAxes,
                 color="red", fontsize=9, wrap=True)
