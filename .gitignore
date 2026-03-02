@@ -1,0 +1,32 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Build / distribution
+dist/
+build/
+*.egg-info/
+
+# PyInstaller output
+*.app
+*.dmg
+
+# macOS
+.DS_Store
+
+# pytest cache
+.pytest_cache/
+*.log
+
+# User presets (saved at runtime)
+~/Library/Application Support/BioPlot/
+
+# Matplotlib config cache
+.matplotlib/

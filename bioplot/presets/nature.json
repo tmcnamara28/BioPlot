@@ -1,0 +1,36 @@
+{
+  "font": {
+    "family": "Arial",
+    "title_size": 8.0,
+    "axis_label_size": 7.0,
+    "tick_label_size": 6.0,
+    "legend_size": 7.0,
+    "annotation_size": 6.0,
+    "bold_title": false
+  },
+  "figure": {
+    "width_mm": 89.0,
+    "height_mm": 67.0,
+    "dpi": 300,
+    "tight_layout": true
+  },
+  "marker": {
+    "size": 10.0,
+    "alpha": 0.8,
+    "edge_color": "none"
+  },
+  "extras": {
+    "rcparams": {
+      "axes.linewidth": 0.5,
+      "axes.spines.top": false,
+      "axes.spines.right": false,
+      "xtick.major.width": 0.5,
+      "ytick.major.width": 0.5,
+      "xtick.major.size": 2.0,
+      "ytick.major.size": 2.0,
+      "lines.linewidth": 0.5,
+      "pdf.fonttype": 42,
+      "ps.fonttype": 42
+    }
+  }
+}
